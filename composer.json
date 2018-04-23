@@ -16,7 +16,7 @@
   },
   "autoload" : {
     "psr-4" : {
-      "johnnymcweed\\event\\" : "src/"
+      "johnnymcweed\\company\\" : "src/"
     }
   },
   "require": {
