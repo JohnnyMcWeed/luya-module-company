@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\company\frontend;
+namespace johnnymcweed\company\frontend;
 
 /**
  * Company Admin Module.
