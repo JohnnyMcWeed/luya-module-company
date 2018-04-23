@@ -89,7 +89,6 @@ class Company extends NgRestModel
     public function attributeLabels()
     {
         return [
-            'id' => Module::t('ID'),
             'title' => Module::t('Title'),
             'logo_id' => Module::t('Logo'),
             'file_list' => Module::t('File List'),
@@ -109,8 +108,8 @@ class Company extends NgRestModel
     {
         return [
             [['title', 'file_list'], 'string'],
-            [['logo_id', 'create_user_id', 'update_user_id', 'timestamp_create', 'timestamp_update', 'timestamp_display_from', 'timestamp_display_until'], 'integer'],
-            [['is_deleted', 'is_display_limit'], 'string', 'max' => 1],
+            [['logo_id', 'create_user_id'], 'integer'],
+            [['is_deleted', 'is_display_limit'], 'integer', 'max' => 1],
             [['companyPlaces', 'companyPeople'], 'safe']
         ];
     }
@@ -130,16 +129,14 @@ class Company extends NgRestModel
     {
         return [
             'title' => 'textarea',
-            'logo_id' => 'number',
-            'file_list' => 'textarea',
-            'create_user_id' => 'number',
-            'update_user_id' => 'number',
-            'timestamp_create' => 'number',
-            'timestamp_update' => 'number',
-            'timestamp_display_from' => 'number',
-            'timestamp_display_until' => 'number',
+            'logo_id' => 'image',
+            'file_list' => 'fileArray',
+            'timestamp_create' => 'datetime',
+            'timestamp_update' => 'datetime',
+            'timestamp_display_from' => 'datetime',
+            'timestamp_display_until' => 'datetime',
             'is_deleted' => 'number',
-            'is_display_limit' => 'number',
+            'is_display_limit' => 'toggleStatus',
             'companyPlaces' => [
                 'class' => CheckboxRelationActiveQuery::class,
                 'query' => $this->getCompanyPlaces(),
@@ -160,7 +157,7 @@ class Company extends NgRestModel
     {
         return [
             ['list', ['title']],
-            [['create', 'update'], ['title', 'logo_id', 'file_list', 'is_deleted', 'companyPeople', 'companyPlaces']],
+            [['create', 'update'], ['title', 'logo_id', 'file_list', 'is_display_limit', 'companyPeople', 'companyPlaces']],
             ['delete', false],
         ];
     }
