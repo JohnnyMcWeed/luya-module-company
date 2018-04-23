@@ -20,7 +20,9 @@
     }
   },
   "require": {
-    "luyadev/luya-core": "~1.0.0"
+    "luyadev/luya-core": "~1.0.0",
+    "johnnymcweed/luya-module-person": "dev-master",
+    "johnnymcweed/luya-module-place": "dev-master"
   },
   "extra": {
 

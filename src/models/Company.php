@@ -2,8 +2,12 @@
 
 namespace johnnymcweed\company\models;
 
+use johnnymcweed\company\admin\Module;
+use johnnymcweed\person\models\Person;
+use johnnymcweed\place\models\Place;
 use Yii;
 use luya\admin\ngrest\base\NgRestModel;
+use luya\admin\ngrest\plugins\CheckboxRelationActiveQuery;
 
 /**
  * Company.
@@ -25,6 +29,9 @@ use luya\admin\ngrest\base\NgRestModel;
  */
 class Company extends NgRestModel
 {
+    public $companyPeople = [];
+    public $companyPlaces = [];
+
     /**
      * @inheritdoc
      */
@@ -44,21 +51,54 @@ class Company extends NgRestModel
     /**
      * @inheritdoc
      */
+    public function init()
+    {
+        parent::init();
+        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'eventBeforeInsert']);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'eventBeforeUpdate']);
+    }
+
+    /**
+     * Event triggers before update
+     */
+    public function eventBeforeUpdate()
+    {
+        $this->update_user_id = Yii::$app->adminuser->getId();
+        $this->timestamp_update = time();
+    }
+
+    /**
+     * Event triggers before insert
+     */
+    public function eventBeforeInsert()
+    {
+        $this->create_user_id = Yii::$app->adminuser->getId();
+        $this->update_user_id = Yii::$app->adminuser->getId();
+        $this->timestamp_update = time();
+        if (empty($this->timestamp_create)) {
+            $this->timestamp_create = time();
+        }
+        if (empty($this->timestamp_display_from)) {
+            $this->timestamp_display_from = time();
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'title' => Yii::t('app', 'Title'),
-            'logo_id' => Yii::t('app', 'Logo ID'),
-            'file_list' => Yii::t('app', 'File List'),
-            'create_user_id' => Yii::t('app', 'Create User ID'),
-            'update_user_id' => Yii::t('app', 'Update User ID'),
-            'timestamp_create' => Yii::t('app', 'Timestamp Create'),
-            'timestamp_update' => Yii::t('app', 'Timestamp Update'),
-            'timestamp_display_from' => Yii::t('app', 'Timestamp Display From'),
-            'timestamp_display_until' => Yii::t('app', 'Timestamp Display Until'),
-            'is_deleted' => Yii::t('app', 'Is Deleted'),
-            'is_display_limit' => Yii::t('app', 'Is Display Limit'),
+            'id' => Module::t('ID'),
+            'title' => Module::t('Title'),
+            'logo_id' => Module::t('Logo'),
+            'file_list' => Module::t('File List'),
+            'timestamp_create' => Module::t('Timestamp Create'),
+            'timestamp_update' => Module::t('Timestamp Update'),
+            'timestamp_display_from' => Module::t('Timestamp Display From'),
+            'timestamp_display_until' => Module::t('Timestamp Display Until'),
+            'is_deleted' => Module::t('Is Deleted'),
+            'is_display_limit' => Module::t('Is Display Limit'),
         ];
     }
 
@@ -71,6 +111,7 @@ class Company extends NgRestModel
             [['title', 'file_list'], 'string'],
             [['logo_id', 'create_user_id', 'update_user_id', 'timestamp_create', 'timestamp_update', 'timestamp_display_from', 'timestamp_display_until'], 'integer'],
             [['is_deleted', 'is_display_limit'], 'string', 'max' => 1],
+            [['companyPlaces', 'companyPeople'], 'safe']
         ];
     }
 
@@ -99,6 +140,16 @@ class Company extends NgRestModel
             'timestamp_display_until' => 'number',
             'is_deleted' => 'number',
             'is_display_limit' => 'number',
+            'companyPlaces' => [
+                'class' => CheckboxRelationActiveQuery::class,
+                'query' => $this->getCompanyPlaces(),
+                'labelField' => ['title']
+            ],
+            'companyPeople' => [
+                'class' => CheckboxRelationActiveQuery::class,
+                'query' => $this->getCompanyPeople(),
+                'labelField' => ['title']
+            ]
         ];
     }
 
@@ -108,9 +159,17 @@ class Company extends NgRestModel
     public function ngRestScopes()
     {
         return [
-            ['list', ['title', 'logo_id', 'file_list', 'create_user_id', 'update_user_id', 'timestamp_create', 'timestamp_update', 'timestamp_display_from', 'timestamp_display_until', 'is_deleted', 'is_display_limit']],
-            [['create', 'update'], ['title', 'logo_id', 'file_list', 'create_user_id', 'update_user_id', 'timestamp_create', 'timestamp_update', 'timestamp_display_from', 'timestamp_display_until', 'is_deleted', 'is_display_limit']],
+            ['list', ['title']],
+            [['create', 'update'], ['title', 'logo_id', 'file_list', 'is_deleted', 'companyPeople', 'companyPlaces']],
             ['delete', false],
         ];
+    }
+
+    public function getCompanyPeople() {
+        return $this->hasMany(Person::class, ['id' => 'person_id'])->viaTable('company_people', ['company_id' => 'id']);
+    }
+
+    public function getCompanyPlaces() {
+        return $this->hasMany(Place::class, ['id' => 'place_id'])->viaTable('company_companyplace', ['company_id' => 'id']);
     }
 }
