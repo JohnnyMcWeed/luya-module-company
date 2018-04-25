@@ -150,6 +150,16 @@ class Company extends NgRestModel
         ];
     }
 
+    public function ngRestAttributeGroups()
+    {
+        return [
+            [['companyPlaces'], Module::t('Places'), 'collapsed' => true],
+            [['companyPeople'], Module::t('People'), 'collapsed' => true],
+            [['timestamp_create', 'timestamp_update', 'timestamp_display_from', 'timestamp_display_limit'], Module::t('Time'), 'collapsed' => true],
+            [['logo_id', 'file_list'], Module::t('Media'), 'collapsed' => true],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
