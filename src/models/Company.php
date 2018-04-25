@@ -108,7 +108,7 @@ class Company extends NgRestModel
     {
         return [
             [['title', 'file_list'], 'string'],
-            [['logo_id', 'create_user_id'], 'integer'],
+            [['logo_id', 'create_user_id', 'timestamp_display_from', 'timestamp_display_until'], 'integer'],
             [['is_deleted', 'is_display_limit'], 'integer', 'max' => 1],
             [['companyPlaces', 'companyPeople'], 'safe']
         ];
@@ -140,12 +140,14 @@ class Company extends NgRestModel
             'companyPlaces' => [
                 'class' => CheckboxRelationActiveQuery::class,
                 'query' => $this->getCompanyPlaces(),
-                'labelField' => ['title']
+                'labelField' => ['title'],
+                'labelTemplate' => '%s'
             ],
             'companyPeople' => [
                 'class' => CheckboxRelationActiveQuery::class,
                 'query' => $this->getCompanyPeople(),
-                'labelField' => ['title']
+                'labelField' => ['first_name', 'last_name'],
+                'labelTemplate' =>  '%s %s'
             ]
         ];
     }
@@ -155,7 +157,7 @@ class Company extends NgRestModel
         return [
             [['companyPlaces'], Module::t('Places'), 'collapsed' => true],
             [['companyPeople'], Module::t('People'), 'collapsed' => true],
-            [['timestamp_create', 'timestamp_update', 'timestamp_display_from', 'timestamp_display_limit'], Module::t('Time'), 'collapsed' => true],
+            [['timestamp_create', 'timestamp_update', 'timestamp_display_from', 'timestamp_display_until', 'is_display_limit'], Module::t('Time'), 'collapsed' => true],
             [['logo_id', 'file_list'], Module::t('Media'), 'collapsed' => true],
         ];
     }
@@ -167,7 +169,8 @@ class Company extends NgRestModel
     {
         return [
             ['list', ['title']],
-            [['create', 'update'], ['title', 'logo_id', 'file_list', 'is_display_limit', 'companyPeople', 'companyPlaces']],
+            [['create', 'update'], ['title', 'logo_id', 'file_list', 'is_display_limit', 'companyPeople', 'companyPlaces',
+                'timestamp_display_from', 'timestamp_display_until', 'is_display_limit']],
             ['delete', false],
         ];
     }
